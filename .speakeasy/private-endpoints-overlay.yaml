@@ -444,7 +444,7 @@ actions:
         - Private Endpoints
         x-speakeasy-name-override: get
       patch:
-        description: 'Replace a draft endpoint''s upstream configuration: send `upstream_model_id`, and `base_url` to change it (an omitted `base_url` keeps the stored one). Omitted data-policy declarations are kept while the upstream is unchanged and cleared when it changes. Any change clears earlier validation. Active endpoints return 409; delete and re-create them instead. [Management key](/docs/guides/overview/auth/management-api-keys) required.'
+        description: 'Update only the supplied fields. Settings are partial updates on drafts and active endpoints; omitted fields keep their stored values. Upstream configuration changes are draft-only and clear earlier validation. [Management key](/docs/guides/overview/auth/management-api-keys) required.'
         operationId: updatePrivateEndpoint
         parameters:
         - description: Stable identifier of the private endpoint.
@@ -1599,3 +1599,34 @@ actions:
   update:
   - description: Private Endpoints endpoints
     name: Private Endpoints
+
+- target: $["components"]["schemas"]
+  update:
+    PrivateEndpointSettings:
+      description: Endpoint settings modeled by this provider; only context_length is managed.
+      example:
+        context_length: 128000
+      type: object
+      properties:
+        context_length:
+          description: Maximum combined input and reserved output token count.
+          example: 128000
+          type: integer
+          format: int64
+          minimum: 1
+- target: $["components"]["schemas"]["CreatePrivateEndpointRequest"]["properties"]
+  update:
+    settings:
+      $ref: '#/components/schemas/PrivateEndpointSettings'
+      description: Context-length override applied when creating the endpoint. Omitted settings preserve the copied defaults.
+- target: $["components"]["schemas"]["PrivateEndpoint"]["properties"]
+  update:
+    settings:
+      $ref: '#/components/schemas/PrivateEndpointSettings'
+      description: Endpoint-specific settings returned by the API.
+- target: $["components"]["schemas"]["UpdatePrivateEndpointRequest"]["required"]
+  remove: true
+- target: $["components"]["schemas"]["UpdatePrivateEndpointRequest"]["properties"]
+  update:
+    settings:
+      $ref: '#/components/schemas/PrivateEndpointSettings'
