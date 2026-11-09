@@ -414,10 +414,8 @@ actions:
   # Component-based: PrivateEndpoint is the read model, ManagedPrivateEndpoint
   # the create response. Create sends `activate` so one apply runs
   # create -> validate -> activate. The API edits pricing and limits in place.
-  # Other create fields force replacement; pricing uses the generated update
-  # operation and limits use the settings PATCH lifecycle helper.
-  # Create and read settings are generated from their schemas. Persistent
-  # resource edits PATCH context_length independently of the pricing update.
+  # Other create fields force replacement. Create and read settings come from
+  # their schemas; update integration must preserve the pricing-write guard.
   # ---------------------------------------------------------------------------
   - target: $["components"]["schemas"]["PrivateEndpoint"]
     update:
